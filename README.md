@@ -12,3 +12,8 @@ Semester: Fall 2026
 ## Tools
 
 **Live app** https://midwest-airbnb-chat-h9xv.onrender.com 
+
+**Questions** 
+Which Columbus neighbourhood has the priciest entire homes?
+
+
