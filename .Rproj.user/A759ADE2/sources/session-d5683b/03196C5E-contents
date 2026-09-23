@@ -1,0 +1,21 @@
+library(DBI)
+library(RSQLite)
+
+con <- dbConnect(SQLite(), "data/midwest_airbnb.db")
+df  <- dbGetQuery(con, "SELECT * FROM listings")
+dbDisconnect(con)
+
+summarize_col <- function(x, name) {
+  if (is.numeric(x)) {
+    sprintf("%-26s | numeric | min=%s max=%s n_na=%d",
+            name, round(min(x, na.rm = TRUE), 2),
+            round(max(x, na.rm = TRUE), 2), sum(is.na(x)))
+  } else {
+    ex <- paste(head(unique(na.omit(x)), 3), collapse = ", ")
+    sprintf("%-26s | text    | examples: %s | n_distinct=%d",
+            name, ex, length(unique(x)))
+  }
+}
+
+cat(mapply(summarize_col, df, names(df)), sep = "\n")
+
