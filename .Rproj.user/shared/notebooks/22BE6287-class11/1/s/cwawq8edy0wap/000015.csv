@@ -1,0 +1,42 @@
+"0","for (dept_name in dept_abbr) {
+  print(dept_name)
+  cat(rep(""-"", 5), collapse = """"); cat(""\n"")
+
+  dept_url = paste0(
+    ""https://bulletin.miamioh.edu/courses-instruction/"", dept_name, ""/"")
+
+  webpage = rvest::read_html(dept_url)
+
+  webpage |> rvest::html_elements(""strong"") |> rvest::html_text2() -> titles
+  webpage |> rvest::html_elements(""#sc_sccoursedescs > div > p.courseblockdesc"") |> rvest::html_text2() -> descs
+
+  n = min(length(titles), length(descs))
+  df = data.frame(title = titles[1:n], desc = descs[1:n])
+  df$title[1] |> print()
+
+  courses_df = rbind(courses_df, df)
+}
+"
+"1","[1]"
+"1"," ""acc"""
+"1","
+"
+"1","-"
+"1"," "
+"1","-"
+"1"," "
+"1","-"
+"1"," "
+"1","-"
+"1"," "
+"1","-"
+"1"," "
+"1",""
+"1","
+"
+"1","[1]"
+"1"," ""ACC 177. Independent Studies. (0-6; maximum 10)"""
+"1","
+"
+"2","Error: object 'courses_df' not found
+"

@@ -1,0 +1,8 @@
+"0","my_urls = paste0(
+  ""https://bulletin.miamioh.edu/courses-instruction/"", # single chr string
+  dept_abbr, # vector of four obs
+  ""/"" # single chr string
+)
+"
+"2","Error: object 'dept_abbr' not found
+"
