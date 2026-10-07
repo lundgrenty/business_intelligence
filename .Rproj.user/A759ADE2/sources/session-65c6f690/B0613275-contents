@@ -1,0 +1,66 @@
+---
+title: "Assignment07"
+author: "Ty Lundgren"
+date: "2026-10-05"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## FSB Directory Scrape
+
+```{r}
+# department labels + their faculty/staff directory URLs
+dept_urls <- c(
+  "Accountancy"                     = "https://miamioh.edu/fsb/directory/?up=/query/all/all/Accountancy/all",
+  "Economics"                       = "https://miamioh.edu/fsb/directory/?up=/query/all/all/Economics/all",
+  "Entrepreneurship"                = "https://miamioh.edu/fsb/directory/?up=/query/all/all/Entrepreneurship/all",
+  "Finance"                         = "https://miamioh.edu/fsb/directory/?up=/query/all/all/Finance/all",
+  "Information Systems & Analytics" = "https://miamioh.edu/fsb/directory/?up=/query/all/all/Information%20Systems%20--%20Analytics/all",
+  "Marketing"                       = "https://miamioh.edu/fsb/directory/?up=/query/all/all/Marketing/all",
+  "Management"                      = "https://miamioh.edu/fsb/directory/?up=/query/all/all/Management/all"
+)
+
+# scrapes one department's directory page
+scrape_fsb_dept <- function(dept_url) {
+
+  page <- rvest::read_html(dept_url)
+  rows <- page |> rvest::html_elements("table tr")
+
+  department <- rows |> rvest::html_element("td:nth-child(1)") |> rvest::html_text2()
+  name       <- rows |> rvest::html_element("td strong a")     |> rvest::html_text2()
+  website    <- rows |> rvest::html_element("td strong a")     |> rvest::html_attr("href")
+  position   <- rows |> rvest::html_element("td i")            |> rvest::html_text2()
+
+  data.frame(department, name, position, website)
+}
+
+fsb_directory_df <- purrr::map_df(.x = dept_urls, .f = scrape_fsb_dept)
+nrow(fsb_directory_df)
+head(fsb_directory_df)
+
+# drop the header row AND keep only the 7 target departments
+fsb_directory_df <- fsb_directory_df[
+  !is.na(fsb_directory_df$name) & fsb_directory_df$department %in% names(dept_urls),
+]
+
+head(fsb_directory_df)
+table(fsb_directory_df$department)
+```
+## AI Assistance
+
+I used ChatISA for parts of this assignment that went past what we covered in class.
+
+- AI helped with a named vector to pair each URL with its department, then using `names()` to get the labels back out. I could have done this with two plain vectors instead, like we did in class, since the department name actually comes from the table itself anyway.
+- AI helped with `html_element()` (singular) instead of `html_elements()` (plural) so each row's name, position, and website stayed matched up correctly. I could have avoided this by just dropping the header row first and using the plural version from class.
+- AI helped with `td:nth-child(1)` to grab the department column, since it had no class or ID to select by. This one I couldn't really avoid.
+- AI helped with `html_attr("href")` to pull the actual link out of the HTML instead of the visible text. `html_text2()` can't do that, so this one I also couldn't avoid.
+- AI helped with `is.na()`, `%in%`, and row subsetting to drop a leftover header row and filter out a few staff who weren't in one of the 7 required departments.
+
+Everything else, like `read_html()`, `html_elements()`, `html_text2()`, writing a function, and using `map_df()` across multiple URLs, follows what we did in class.
