@@ -1,0 +1,72 @@
+---
+title: 'class 12: we scraping'
+author: "Ty Lundgren"
+date: "2026-10-05"
+output: 
+  html_document: true
+    toc: true
+    toc_float: ture
+    numbered_sections: true
+    code_downloading: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r crashes}
+
+
+year = 2025
+
+crash_url = paste0('https://www.planecrashinfo.com/', year, '/', year, '.htm')
+
+crash_page <- rvest::read_html(crash_url, encoding = "ISO-8859-1")
+
+# This should now print without the error
+crash_page
+
+crash_tables <- crash_page |>
+  rvest::html_elements("table") |>
+  rvest::html_table()
+
+crash_df = crash_tables[[1]]
+# from cleaning perspective, there are several things that can be changed: 
+# [1] replace tha column names with the first row
+# [2] have column tpyes ( Date being a date instead of chr)
+# [3] there are possible things you can do to cleans the data within columns e.g. split columns that contain multiple pieces of information 
+
+# focus on first one
+
+
+
+colnames(crash_df) = crash_df[1, ]
+crash_df = crash_df[-1, ]
+crash_df = crash_df |> dplyr::mutate(Date = lubridate::dmy(Date))
+
+head(crash_df)
+
+page = rvest::read_html("https://isa401-salvage.vercel.app/registry?start=1")
+classes = page |>
+  rvest::html_elements(".Dreadnought") |>
+  rvest::html_text2()
+length(classes)
+
+```
+
+## strucured text extraction 
+
+```{r courses}
+chat = ellmer::chat_openai(
+  model = "gpt-5.6-luna"
+  params = ellmer::params(reasoning_effort = "none")
+  
+  
+  
+  
+)
+
+
+
+```
+

@@ -1,0 +1,3 @@
+skills_long = skills_wide |>
+  tidyr::pivot_longer(cols = c("2024", "2025", "2026"),
+                      names_to = "year", values_to = "share")

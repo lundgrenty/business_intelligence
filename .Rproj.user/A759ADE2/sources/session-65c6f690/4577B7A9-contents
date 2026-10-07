@@ -1,0 +1,96 @@
+hibp <- jsonlite::fromJSON(file.choose())
+nrow(hibp)
+dplyr::glimpse(hibp)
+hibp$BreachName[500]
+sum(grepl("@miamioh\\.edu$", hibp$Email))
+
+robotstxt::paths_allowed(
+  paths = "/wiki/Miami_University",
+  domain = "en.wikipedia.org",
+  bot = "*"
+)
+
+
+library(rvest)
+
+page <- rvest::read_html(
+  "https://miamioh.edu/policy-library/students/undergraduate/academic-regulations/index.html"
+)
+
+mu_policies <- page |>
+  rvest::html_elements("main#main a.news-lockup__body-link") |>
+  rvest::html_attr("href")
+
+length(mu_policies)
+mu_policies
+
+
+library(rvest)
+
+url <- "https://miamiredhawks.com/sports/swimming-and-diving/roster"
+page <- rvest::read_html(url)
+
+cards <- page |>
+  rvest::html_elements("#listPanel .s-person-card--list")
+
+name <- cards |>
+  rvest::html_element(".s-person-details__personal-single-line h3") |>
+  rvest::html_text2()
+
+year_raw <- cards |>
+  rvest::html_element('[data-test-id="s-person-details__bio-stats-person-title"]') |>
+  rvest::html_text2()
+year <- sub("^Academic Year", "", year_raw)
+
+location_raw <- cards |>
+  rvest::html_element('[data-test-id="s-person-card-list__content-location-person-hometown"]') |>
+  rvest::html_text2()
+location <- sub("^Hometown", "", location_raw)
+
+swim_df <- data.frame(name, location, year) |>
+  dplyr::filter(!is.na(year)) |>
+  dplyr::select(name, location)
+
+nrow(swim_df)
+head(swim_df)
+
+
+library(httr2)
+library(jsonlite)
+
+toxic_ips <- readr::read_csv("../data/toxic_ips_oct2025.csv")
+
+fields <- paste(
+  "status", "continent", "country", "countryCode", "region", "regionName",
+  "city", "district", "zip", "lat", "lon", "timezone", "currency",
+  "isp", "org", "as", "query",
+  sep = ","
+)
+
+get_ip_info <- function(ip) {
+  url <- paste0("http://ip-api.com/json/", ip, "?fields=", fields)
+  
+  resp <- httr2::request(url) |>
+    httr2::req_perform() |>
+    httr2::resp_body_string() |>
+    jsonlite::fromJSON()
+  
+  as.data.frame(resp)
+}
+
+ip_df <- purrr::map_df(.x = toxic_ips$IP, .f = get_ip_info)
+
+nrow(ip_df)   # should print 10
+ncol(ip_df)   # should print 17
+ip_df
+
+# reading the data from my github repo to avoid an issues with file location
+ntse_tbl = readr::read_csv('https://raw.githubusercontent.com/fmegahed/isa401/main/data/ntse_endowment_us_and_canada_2020.csv')
+
+# a glimpse of the data
+# for this analysis, do NOT convert chr to factors (do not worry about this)
+dplyr::glimpse(ntse_tbl)
+
+ntse_tbl <- readr::read_csv('https://raw.githubusercontent.com/fmegahed/isa401/41bb332dbd8457b6fdbdbe0200d5ff92b8dc93e4/data/ntse_endowment_us_and_canada_2020.csv')
+
+dplyr::glimpse(ntse_tbl)
